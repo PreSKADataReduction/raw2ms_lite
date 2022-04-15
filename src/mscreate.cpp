@@ -287,17 +287,25 @@ int mscreate::add_polarization (int npolarizations)
   MSPolarizationColumns ms_pol_col(ms_pol);
   uInt rownr = ms_pol.nrow();
   Vector<Int> corr_type(npolarizations);
-  corr_type(0) = Stokes::XX;
-  if (npolarizations == 2)
-    {
-      corr_type(1) = Stokes::YY;
-    }
+  if (npolarizations == 1)
+  {
+    corr_type(0) = Stokes::I;
+  }
+  else if (npolarizations == 2)
+  {
+    corr_type(0) = Stokes::XX;
+    corr_type(1) = Stokes::YY;
+  }
   else if (npolarizations == 4)
-    {
-      corr_type(1) = Stokes::XY;
-      corr_type(2) = Stokes::YX;
-      corr_type(3) = Stokes::YY;
-    }
+  {
+    corr_type(1) = Stokes::XY;
+    corr_type(2) = Stokes::YX;
+    corr_type(3) = Stokes::YY;
+  }
+  else
+  {
+    assert(0);
+  }
   Matrix<Int> corr_product(2, npolarizations);
   for (Int i=0; i<npolarizations; i++) {
     corr_product(0,i) = Stokes::receptor1(Stokes::type(corr_type(i)));

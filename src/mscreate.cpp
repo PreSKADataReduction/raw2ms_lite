@@ -308,8 +308,14 @@ int mscreate::add_polarization (int npolarizations)
   }
   Matrix<Int> corr_product(2, npolarizations);
   for (Int i=0; i<npolarizations; i++) {
-    corr_product(0,i) = Stokes::receptor1(Stokes::type(corr_type(i)));
-    corr_product(1,i) = Stokes::receptor2(Stokes::type(corr_type(i)));
+    if (corr_type(i)!=Stokes::I){      
+      corr_product(0,i) = Stokes::receptor1(Stokes::type(corr_type(i)));
+      corr_product(1,i) = Stokes::receptor2(Stokes::type(corr_type(i)));
+    }
+    else{
+      corr_product(0,i) = Stokes::receptor1(Stokes::XX);
+      corr_product(1,i) = Stokes::receptor2(Stokes::XX);
+    }
   }
   // Fill the columns.
   ms_pol.addRow();

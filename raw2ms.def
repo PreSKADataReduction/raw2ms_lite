@@ -13,7 +13,7 @@ From: ubuntu:20.04
     until apt-get -y update; do sleep 1; done
     until apt-get -y dist-upgrade; do sleep 1; done
     until apt-get -y install emacs git python python3 wget curl imagemagick ffmpeg \
-    axel iputils-ping dnsutils python3-pip cmake \
+    axel iputils-ping dnsutils python3-pip cmake adwaita-icon-theme-full \
     libblitz0-dev pkg-config libcfitsio-dev \
     python3-ipython ipython3 gdb \
     python3-pip \
@@ -26,7 +26,7 @@ From: ubuntu:20.04
     
     until apt-get -y install cython nodejs npm; do sleep 1; done
 
-    
+    update-mime-database /usr/share/mime
 
 
 #CASA etc
@@ -48,10 +48,13 @@ make -C /src/raw2ms_lite install
     include /src/raw2ms_lite/include
     Makefile /src/raw2ms_lite/Makefile
     src /src/raw2ms_lite/src
+    current_version /current_version
     
 %environment
     export LC_ALL=C
     export PATH=/usr/local/bin:$PATH
+    #export XDG_DATA_DIR=${XDG_DATA_DIR}:/usr/share
+    export XDG_DATA_HOME=/usr/share
 
 %labels
     Author JhGU

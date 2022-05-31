@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-sudo singularity build casa.simg raw2ms.def
+git rev-parse HEAD >current_version
+sudo singularity build casa_`git rev-parse --short HEAD`.simg raw2ms.def

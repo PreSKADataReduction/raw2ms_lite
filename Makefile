@@ -4,7 +4,7 @@ all:$(target)
 
 INC=-I ../mscreate/include -I /usr/include/casacore/ -I ./include
 CXXFLAGS=-O3 -std=c++11
-LDFLAGS=-lcasa_casa -lcasa_ms -lcasa_measures -lcasa_tables -lcfitsio
+LDFLAGS=-lcasa_casa -lcasa_ms -lcasa_measures -lcasa_tables -lcfitsio -lboost_program_options -lboost_system
 
 OBJS=obj/date_time.o obj/fio.o obj/fitsfile.o obj/fits_trait.o obj/region.o obj/region_imp.o obj/mscreate.o
 

@@ -16,6 +16,10 @@
 #include <ms/MeasurementSets.h>
 #include <measures/Measures/MBaseline.h>
 
+#include <boost/program_options.hpp>
+#include <boost/format.hpp>
+
+
 #include <cassert>
 #include <string>
 #include <iostream>
@@ -32,6 +36,8 @@
 using namespace std;
 using namespace casacore;
 using namespace ulastai;
+namespace po = boost::program_options;
+
 const double pi = atan (1) * 4;
 const int img_size = 4096;
 const double max_bl = 2640;
@@ -40,13 +46,33 @@ const double c = 2.99792458E8;
 const double max_uv = max_bl / (c / max_freq);
 int main (int argc, char *argv[])
 {
-    if (argc != 4)
-        {
-            std::cerr << "Usage:" << argv[0] << " <ms table> <outfile> <column>" << endl;
-            return -1;
-        }
+    string ms_name;
+    string out_name;
+    string data_col_name;
+    
+    
+    po::options_description options("Allowed options");
+    options.add_options()
+      ("help", "produce help message")
+      ("in,i", po::value<string>(&ms_name), "input ms name")
+      ("out,o", po::value<string>(&out_name), "output name")
+      ("col,c", po::value<string>(&data_col_name), "col name")
+      ("noflag,f", "whether flag is ignored")
+      ;
 
-    MeasurementSet mstab (argv[1], TableLock (TableLock::AutoNoReadLocking));
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, options), vm);
+    po::notify(vm);
+
+    if (vm.count("in")==0 || vm.count("out")==0 || vm.count("col")==0){
+      std::cout << boost::format("convert ms to uvmap %s") % options << std::endl;
+      return ~0;
+    }
+
+    bool noflag=vm.count("noflag");
+    std::cerr<<"ignore flag"<<std::endl;
+    
+    MeasurementSet mstab (ms_name, TableLock (TableLock::AutoNoReadLocking));
 
     cout << mstab.nrow () << std::endl;
 
@@ -74,7 +100,7 @@ int main (int argc, char *argv[])
     // const ROArrayColumn< Complex >& data_column(columns.data());
     // const ROArrayColumn< Complex >& data_column(columns.correctedData());
     // const ROArrayColumn< Complex >& data_column(columns.modelData());
-    const ArrayColumn<Complex> data_column (mstab, argv[3]);
+    const ArrayColumn<Complex> data_column (mstab, data_col_name);
     // std::cout<<v<<std::endl;
 
     blitz::Array<double, 2> mxr (img_size, img_size);
@@ -106,7 +132,7 @@ int main (int argc, char *argv[])
             for (int ch = 0; ch < data.size (); ++ch)
                 {
                     // cout<<d.real()<<endl;
-                    if (!flag[ch])
+                    if (!flag[ch] || noflag)
                         {
                             Complex d (data[ch]);
                             double freq = chan_freq[ch];
@@ -139,7 +165,7 @@ int main (int argc, char *argv[])
                         }
                 }
         }
-    std::string prefix (argv[2]);
+    std::string prefix (out_name);
     cfitsfile ff;
     ff.create ((prefix + "_r.fits").c_str ());
     ff << mxr;

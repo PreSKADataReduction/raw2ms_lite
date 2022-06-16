@@ -70,7 +70,10 @@ int main (int argc, char *argv[])
     }
 
     bool noflag=vm.count("noflag");
-    std::cerr<<"ignore flag"<<std::endl;
+
+    if (noflag){
+      std::cerr<<"ignore flag"<<std::endl;
+    }
     
     MeasurementSet mstab (ms_name, TableLock (TableLock::AutoNoReadLocking));
 

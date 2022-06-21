@@ -17,7 +17,7 @@ From: ubuntu:20.04
     libblitz0-dev pkg-config libcfitsio-dev \
     python3-ipython ipython3 gdb \
     python3-pip \
-    tmux gfortran \
+    tmux gfortran qt5-default\
     libhdf5-dev lua5.3 lua5.3-dev \
     libgsl-dev autotools-dev automake ; do sleep 1; done
     #pip3 install astropy=='2.0.4'
@@ -46,7 +46,11 @@ From: ubuntu:20.04
     cmake ..
     make -j16
     make install
-    
+
+    cd ${SINGULARITY_ROOTFS}/src/oskar/build
+    cmake ..
+    make -j16
+    make install
 
 make -C /src/raw2ms_lite install
 
@@ -70,3 +74,5 @@ make -C /src/raw2ms_lite install
 mkdir -p ${SINGULARITY_ROOTFS}/src
 until git clone --recurse-submodules https://gitlab.com/aroffringa/aoflagger.git ${SINGULARITY_ROOTFS}/src/aoflagger; do sleep 1; done
 mkdir -p ${SINGULARITY_ROOTFS}/src/aoflagger/build
+until git clone --recurse-submodules https://github.com/OxfordSKA/OSKAR.git ${SINGULARITY_ROOTFS}/src/oskar; do sleep 1; done
+mkdir ${SINGULARITY_ROOTFS}/src/oskar/build

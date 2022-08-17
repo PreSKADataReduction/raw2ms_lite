@@ -2,14 +2,19 @@ BootStrap: docker
 From: ubuntu:20.04
 
 %post
+apt -y update
+    apt -y install openssl
+        dpkg -r --force-depends ca-certificates
+        dpkg -i ${SINGULARITY_ROOTFS}/ca-certificates_20211016~20.04.1_all.deb
+
+    rm -f /etc/apt/sources.list
+    cp -f /src/sources.list /etc/apt
     apt-get -y update
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     until apt-get -y install tzdata; do sleep 1; done
     until apt-get -y install python3-pip; do sleep 1; done
-    until pip install apt-select; do sleep 1; done
-    until apt-select --country CN; do sleep 1; done
-    rm -f /etc/apt/sources.list
-    cp -f sources.list /etc/apt
+    #until pip install apt-select; do sleep 1; done
+    #until apt-select --country CN; do sleep 1; done
     until apt-get -y update; do sleep 1; done
     until apt-get -y dist-upgrade; do sleep 1; done
     until apt-get -y install emacs git python python3 wget curl imagemagick ffmpeg \
@@ -38,8 +43,8 @@ From: ubuntu:20.04
     until apt-get -y update; do sleep 1; done
     until apt-get -y install casacore-dev casacore-doc casacore-doc casacore-tools libcasa-casa5 libcasa-casa6 libcasa-coordinates5 libcasa-coordinates6 libcasa-derivedmscal5 libcasa-derivedmscal6 libcasa-fits5 libcasa-fits6 libcasa-images5 libcasa-images6 libcasa-lattices5 libcasa-lattices6 libcasa-meas5 libcasa-meas6 libcasa-measures5 libcasa-measures6 libcasa-mirlib5 libcasa-mirlib6 libcasa-ms5 libcasa-ms6 libcasa-msfits5 libcasa-msfits6 libcasa-python3-5 libcasa-python3-6 libcasa-scimath-f5 libcasa-scimath-f6 libcasa-scimath5 libcasa-scimath6 libcasa-tables5 libcasa-tables6 \
     libfftw3-dev libboost-all-dev libxml2-dev liblapack-dev libgtkmm-3.0-dev \
-    g++ libpng-dev doxygen graphviz wsclean chgcentre cubical python3-cubical makems libmeqtrees-timba0 meqtrees-timba python3-meqtrees-timba \
-    libboost-numpy-dev libboost-python-dev \
+    g++ libpng-dev doxygen graphviz cubical python3-cubical makems libmeqtrees-timba0 meqtrees-timba python3-meqtrees-timba \
+    libboost-numpy-dev libboost-python-dev python-is-python3 \
     casacore-data casarest python3-casacore casalite msutils; do sleep 1; done
 
     cd ${SINGULARITY_ROOTFS}/src/aoflagger/build
@@ -52,10 +57,17 @@ From: ubuntu:20.04
     make -j16
     make install
 
-make -C /src/raw2ms_lite install
+    cd ${SINGULARITY_ROOTFS}/src/wsclean/build
+    git checkout 047f6cb6038065ef12520704c8191c2ba2263e0c
+    cmake ..
+    make -j16
+    make install
+
+    make -C /src/raw2ms_lite install
 
 
-%files 
+%files
+    sources.list /src/sources.list 
     include /src/raw2ms_lite/include
     Makefile /src/raw2ms_lite/Makefile
     src /src/raw2ms_lite/src
@@ -71,8 +83,13 @@ make -C /src/raw2ms_lite install
     Author JhGU
 
 %setup
+wget http://security.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20211016~20.04.1_all.deb -O ${SINGULARITY_ROOTFS}/ca-certificates_20211016~20.04.1_all.deb
+
 mkdir -p ${SINGULARITY_ROOTFS}/src
 until git clone --recurse-submodules https://gitlab.com/aroffringa/aoflagger.git ${SINGULARITY_ROOTFS}/src/aoflagger; do sleep 1; done
 mkdir -p ${SINGULARITY_ROOTFS}/src/aoflagger/build
 until git clone --recurse-submodules https://github.com/OxfordSKA/OSKAR.git ${SINGULARITY_ROOTFS}/src/oskar; do sleep 1; done
 mkdir ${SINGULARITY_ROOTFS}/src/oskar/build
+until git clone --recurse-submodules https://gitlab.com/aroffringa/wsclean.git ${SINGULARITY_ROOTFS}/src/wsclean; do sleep 1; done
+mkdir ${SINGULARITY_ROOTFS}/src/wsclean/build
+

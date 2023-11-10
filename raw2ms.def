@@ -27,7 +27,7 @@ apt -y update
     libgsl-dev autotools-dev automake ; do sleep 1; done
     #pip3 install astropy=='2.0.4'
 
-    until pip3 install h5py ipython astropy ephem h5py healpy matplotlib numpy scipy pandas pyephem  PyYAML scikits.fitting scipy pyqt5; do sleep 1; done
+    until pip3 install h5py ipython astropy ephem h5py healpy matplotlib numpy scipy pandas pyephem  PyYAML scikits.fitting scipy; do sleep 1; done
     
     
     until apt-get -y install cython nodejs npm; do sleep 1; done

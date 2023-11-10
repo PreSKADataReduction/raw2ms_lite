@@ -20,6 +20,8 @@
 #include <memory>
 #include <date_time.hpp>
 #include <signal_handler.hpp>
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
 
 using namespace ulastai;
 using namespace casacore;
@@ -203,26 +205,75 @@ std::pair<int, int> parse_ch (const std::string &s)
 
 int main (int argc, char **argv)
 {
-    if (argc < 6)
-        {
-            std::cerr << "Usage:" << argv[0] << " <antenna table> <out name> <date> <input path> <ch1:ch2> [ch3:ch4] [ch5:ch6]..."
-                      << std::endl;
-            return -1;
-        }
-    std::string antenna_tab_name (argv[1]);
-    std::string out_prefix (argv[2]);
-    std::string date (argv[3]);
-    std::string input_path (argv[4]);
+    
+    std::string antenna_tab_name;
+    std::string out_prefix;
+    std::string date;
+    std::string input_path;
+    std::vector<std::string> ch_lim_list;
+    bool xx_as_xx=false;
+    po::options_description desc("Allowed options");
+    
+    desc.add_options()
+        ("help", "produce help message")
+        ("ant,a", po::value<std::string>(&antenna_tab_name)->default_value(""), "antenna table name")
+        ("out,o", po::value<std::string>(&out_prefix)->default_value(""), "output_prefix")
+        ("date,d", po::value<std::string>(&date)->default_value(""), "yyyymmdd date string")
+        ("in,i", po::value<std::string>(&input_path)->default_value(""), "input dir containing time and bin files")
+        ("xx,x", po::bool_switch(&xx_as_xx), "write XX pol rather than I")
+        ("ch", po::value<std::vector<std::string>>(&ch_lim_list)->multitoken(), "<ch1:ch2> [ch3:ch4] [ch5:ch6]...");
+    ;
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
 
+    if (vm.count("help")){
+        cout << desc << "\n";
+        return 1;
+    }
+    if (vm.count("ant")==0){
+        std::cout<<"antenna table not given"<<std::endl;
+        cout << desc << "\n";
+        return 1;
+    }
+
+    if (vm.count("out")==0){
+        std::cout<<"out path not given"<<std::endl;
+        cout << desc << "\n";
+        return 1;
+    }
+
+    if (vm.count("date")==0){
+        std::cout<<"date not given"<<std::endl;
+        cout << desc << "\n";
+        return 1;
+    }
+
+    if (vm.count("in")==0){
+        std::cout<<"in path not given"<<std::endl;
+        cout << desc << "\n";
+        return 1;
+    }
+
+    if (vm.count("ch")==0){
+        std::cout<<"ch limit list not given"<<std::endl;
+        cout << desc << "\n";
+        return 1;
+    }
+
+    std::cout<<antenna_tab_name<<std::endl;
+    std::cout<<out_prefix<<std::endl;        
     std::vector<std::pair<int, int>> chlimits;
-    for (int i = 5; i < argc; ++i)
+    //for (int i = 5; i < argc; ++i)
+    for(const std::string chs:ch_lim_list)
         {
-            std::string chs (argv[i]);
+            //std::string chs (s);
+            std::cout<<chs<<std::endl;
             chlimits.push_back (parse_ch (chs));
             assert (chlimits.back ().first < chlimits.back ().second);
             assert (chlimits.back ().first >= 2048 && chlimits.back ().second <= 8192);
         }
-
+    
     Table ant_tab (antenna_tab_name, TableLock (TableLock::AutoNoReadLocking));
 
     ROArrayColumn<double> pos_col (ant_tab, "POSITION");
@@ -266,7 +317,7 @@ int main (int argc, char **argv)
             std::string out_name =
             out_prefix + std::to_string (ch_lower) + ":" + std::to_string (ch_upper) + ".MS";
             auto p =
-            std::shared_ptr<mscreate> (new mscreate (out_name, vbs.get_start_time (), 1, ant_tab, array_pos));
+            std::shared_ptr<mscreate> (new mscreate (out_name, vbs.get_start_time (), 1, ant_tab, array_pos, xx_as_xx));
 
             msmakers.push_back (p);
             int nch = ch_upper - ch_lower;
@@ -275,7 +326,6 @@ int main (int argc, char **argv)
             msmakers.back ()->add_band (nch, fref, freq_per_ch);
             msmakers.back ()->add_field (0.0, pi / 2);
         }
-
 
     for (int i = 0; running; ++i)
         {

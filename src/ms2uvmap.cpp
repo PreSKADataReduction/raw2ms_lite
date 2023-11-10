@@ -40,23 +40,29 @@ namespace po = boost::program_options;
 
 const double pi = atan (1) * 4;
 const int img_size = 4096;
-const double max_bl = 2640;
+
 const double max_freq = 200E6;
 const double c = 2.99792458E8;
-const double max_uv = max_bl / (c / max_freq);
+//const double max_uv = 
+double max_uv(double max_bl, double max_freq){
+    return max_bl / (c / max_freq);
+}
+
 int main (int argc, char *argv[])
 {
     string ms_name;
     string out_name;
     string data_col_name;
+    double max_bl=2740.0;
     
     
     po::options_description options("Allowed options");
     options.add_options()
-      ("help", "produce help message")
+      ("help,h", "produce help message")
       ("in,i", po::value<string>(&ms_name), "input ms name")
       ("out,o", po::value<string>(&out_name), "output name")
       ("col,c", po::value<string>(&data_col_name), "col name")
+      ("maxbl,m", po::value<double>(&max_bl)->default_value(2740.0), "max baseline length, default: 2740 m")
       ("noflag,f", "whether flag is ignored")
       ;
 
@@ -112,6 +118,7 @@ int main (int argc, char *argv[])
     mxr = 0;
     mxi = 0;
     cnt = 0;
+    double max_uv_value=max_uv(max_bl,max_freq);
 
 
     for (int i = 0; i < columns.nrow (); ++i)
@@ -143,8 +150,8 @@ int main (int argc, char *argv[])
                             double u_l = uvw[0] / lambda;
                             double v_l = uvw[1] / lambda;
                             double w_l = uvw[2] / lambda;
-                            int iu = u_l / max_uv * (img_size / 2) + img_size / 2;
-                            int iv = v_l / max_uv * (img_size / 2) + img_size / 2;
+                            int iu = u_l / max_uv_value * (img_size / 2) + img_size / 2;
+                            int iv = v_l / max_uv_value * (img_size / 2) + img_size / 2;
 
                             if (iu >= 0 && iu < img_size && iv >= 0 && iv < img_size && ant1 != ant2)
                                 {

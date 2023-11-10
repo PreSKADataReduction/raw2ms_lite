@@ -140,7 +140,7 @@ namespace ulastai
     mscreate (const std::string& ms_name,
 	      double start_time, int npol,
 	      const casacore::Table& ant_tab,
-	      const casacore::MPosition& array_pos);
+	      const casacore::MPosition& array_pos, bool _xx_as_xx=false);
 
     // Destructor
     ~mscreate();
@@ -246,6 +246,7 @@ namespace ulastai
     casacore::MeasurementSet* its_ms;
     casacore::MSMainColumns*  its_ms_col;
     bool correct_w;
+    bool xx_as_xx;
     std::vector<std::vector<double> > ch_freq_vectors;
   public:
     //utility functions, static members

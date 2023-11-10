@@ -2,7 +2,7 @@ target=bin/raw2ms_splited bin/ms2uvmap
 
 all:$(target)
 
-INC=-I ../mscreate/include -I /usr/include/casacore/ -I ./include
+INC=-I /usr/include/casacore/ -I ./include
 CXXFLAGS=-O3 -std=c++11
 LDFLAGS=-lcasa_casa -lcasa_ms -lcasa_measures -lcasa_tables -lcfitsio -lboost_program_options -lboost_system
 

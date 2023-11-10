@@ -68,7 +68,7 @@ double raw_data_source::time()const
 mscreate::mscreate (const std::string& ms_name,
 		    double start_time, int npol,
 		    const Table& ant_tab,
-		    const casacore::MPosition& array_pos)
+		    const casacore::MPosition& array_pos, bool _xx_as_xx)
   : its_nbands        (0),
     its_nfields       (0),
     its_nantennas         (0),
@@ -86,7 +86,8 @@ mscreate::mscreate (const std::string& ms_name,
     its_phase_dir      (new Block<MDirection>()),
     its_ms            (0),
     its_ms_col         (0),
-    correct_w(false)
+    correct_w(false),
+    xx_as_xx(_xx_as_xx)
 {
   
   // Use the middle antenna as the array position.
@@ -289,7 +290,13 @@ int mscreate::add_polarization (int npolarizations)
   Vector<Int> corr_type(npolarizations);
   if (npolarizations == 1)
   {
-    corr_type(0) = Stokes::I;
+    if (xx_as_xx){
+      corr_type(0) = Stokes::XX;
+    }else
+    {
+      corr_type(0) = Stokes::I;
+    }
+    
   }
   else if (npolarizations == 2)
   {

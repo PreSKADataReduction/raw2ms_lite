@@ -4,8 +4,8 @@ From: ubuntu:20.04
 %post
 apt -y update
     apt -y install openssl
-        dpkg -r --force-depends ca-certificates
-        dpkg -i ${SINGULARITY_ROOTFS}/ca-certificates_20211016~20.04.1_all.deb
+    dpkg -r --force-depends ca-certificates
+    dpkg -i ${SINGULARITY_ROOTFS}/ca-certificates_20230311ubuntu0.20.04.1_all.deb
 
     rm -f /etc/apt/sources.list
     cp -f /src/sources.list /etc/apt
@@ -83,7 +83,7 @@ apt -y update
     Author JhGU
 
 %setup
-wget http://security.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20211016~20.04.1_all.deb -O ${SINGULARITY_ROOTFS}/ca-certificates_20211016~20.04.1_all.deb
+wget http://security.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20230311ubuntu0.20.04.1_all.deb -O ${SINGULARITY_ROOTFS}/ca-certificates_20211016~20.04.1_all.deb
 
 mkdir -p ${SINGULARITY_ROOTFS}/src
 until git clone --recurse-submodules https://gitlab.com/aroffringa/aoflagger.git ${SINGULARITY_ROOTFS}/src/aoflagger; do sleep 1; done

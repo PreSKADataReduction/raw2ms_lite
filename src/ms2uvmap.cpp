@@ -128,8 +128,16 @@ int main (int argc, char *argv[])
             int spwid = spwId.get (did);
             const Vector<double> chan_freq (chan_freq_column.get (spwid));
             const Vector<Double> uvw (uvw_column.get (i));
-            const Vector<Complex> data (data_column.get (i));
-            const Vector<Bool> flag (flag_column.get (i));
+            //const Vector<Complex> data (data_column.get (i));
+            //const Vector<Bool> flag (flag_column.get (i));
+            auto d=data_column.get(i);
+
+            const Vector<Complex> data (d.ndim()==1?d:((Matrix<Complex>&)d).row(0));
+
+            auto f=flag_column.get(i);
+
+            const Vector<Bool> flag (f.ndim()==1?f:((Matrix<bool>&)f).row(0));
+
             auto ant1 = ant1_column.get (i);
             auto ant2 = ant2_column.get (i);
 

@@ -38,6 +38,10 @@ const double Dec = pi / 2;
 const bool writeAutoCorr = false;
 const int nchannels = 8192;
 
+static double deg2rad(double x){
+    return x/180.0*pi;  
+}
+
 struct data_flag_pair
 {
     casacore::Array<casacore::Complex> data;
@@ -211,6 +215,8 @@ int main (int argc, char **argv)
     std::string date;
     std::string input_path;
     std::vector<std::string> ch_lim_list;
+    double center_ra_deg=0.0;
+    double center_dec_deg=90.0;
     bool xx_as_xx=false;
     po::options_description desc("Allowed options");
     
@@ -221,7 +227,9 @@ int main (int argc, char **argv)
         ("date,d", po::value<std::string>(&date)->default_value(""), "yyyymmdd date string")
         ("in,i", po::value<std::string>(&input_path)->default_value(""), "input dir containing time and bin files")
         ("xx,x", po::bool_switch(&xx_as_xx), "write XX pol rather than I")
-        ("ch", po::value<std::vector<std::string>>(&ch_lim_list)->multitoken(), "<ch1:ch2> [ch3:ch4] [ch5:ch6]...");
+        ("ch", po::value<std::vector<std::string>>(&ch_lim_list)->multitoken(), "<ch1:ch2> [ch3:ch4] [ch5:ch6]...")
+        ("cra", po::value<double>(&center_ra_deg)->default_value(0.0), "<RA in deg>")
+        ("cdec", po::value<double>(&center_dec_deg)->default_value(90.0), "<Dec in deg>");
     ;
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -260,6 +268,9 @@ int main (int argc, char **argv)
         cout << desc << "\n";
         return 1;
     }
+
+    std::cout<<center_ra_deg<<" "<<center_dec_deg<<std::endl;
+    exit(0);
 
     std::cout<<antenna_tab_name<<std::endl;
     std::cout<<out_prefix<<std::endl;        
@@ -324,7 +335,7 @@ int main (int argc, char **argv)
             // double fref=ch_lower*freq_per_ch+freq_per_ch/2.0;
             double fref = (ch_lower + ch_upper) / 2.0 * freq_per_ch;
             msmakers.back ()->add_band (nch, fref, freq_per_ch);
-            msmakers.back ()->add_field (0.0, pi / 2);
+            msmakers.back ()->add_field (deg2rad(center_ra_deg), deg2rad(center_dec_deg));
         }
 
     for (int i = 0; running; ++i)

@@ -72,6 +72,7 @@ apt -y update
     Makefile /src/raw2ms_lite/Makefile
     src /src/raw2ms_lite/src
     current_version /current_version
+    change_log.txt /change_log.txt
     
 %environment
     export LC_ALL=C
@@ -86,10 +87,10 @@ apt -y update
 wget http://security.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20230311ubuntu0.20.04.1_all.deb -O ${SINGULARITY_ROOTFS}/ca-certificates_20230311ubuntu0.20.04.1_all.deb
 
 mkdir -p ${SINGULARITY_ROOTFS}/src
-until git clone --recurse-submodules https://gitlab.com/aroffringa/aoflagger.git ${SINGULARITY_ROOTFS}/src/aoflagger; do sleep 1; done
+until rm -rf ${SINGULARITY_ROOTFS}/src/aoflagger ; git clone --recurse-submodules https://gitlab.com/aroffringa/aoflagger.git ${SINGULARITY_ROOTFS}/src/aoflagger; do sleep 1; done
 mkdir -p ${SINGULARITY_ROOTFS}/src/aoflagger/build
-until git clone --recurse-submodules https://github.com/OxfordSKA/OSKAR.git ${SINGULARITY_ROOTFS}/src/oskar; do sleep 1; done
+until rm -rf ${SINGULARITY_ROOTFS}/src/oskar ; git clone --recurse-submodules https://github.com/OxfordSKA/OSKAR.git ${SINGULARITY_ROOTFS}/src/oskar; do sleep 1; done
 mkdir ${SINGULARITY_ROOTFS}/src/oskar/build
-until git clone --recurse-submodules https://gitlab.com/aroffringa/wsclean.git ${SINGULARITY_ROOTFS}/src/wsclean; do sleep 1; done
+until rm -rf ${SINGULARITY_ROOTFS}/src/wsclean; git clone --recurse-submodules https://gitlab.com/aroffringa/wsclean.git ${SINGULARITY_ROOTFS}/src/wsclean; do sleep 1; done
 mkdir ${SINGULARITY_ROOTFS}/src/wsclean/build
 
